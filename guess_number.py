@@ -96,9 +96,3 @@ if __name__ == "__main__":
 #当脚本被直接运行时，__name__ 的值为 "__main__"
 #当脚本被导入为模块时，__name__ 的值为模块的名称（例如 "guess_number"）
 #上述语句的含义是，只有当脚本被直接运行时，才执行 guess_number_game() 函数
-
-# 在另一个文件中
-import guess_number
-
-# 只使用游戏中的某些函数，而不启动整个游戏
-guess_number.display_tasks(my_tasks)
