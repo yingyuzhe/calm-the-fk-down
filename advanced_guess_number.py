@@ -150,7 +150,7 @@ def advanced_guess_number_game():
         print(".", end="", flush=True)
     print("\n")
     
-    secret_number = random.randint(min_num, max_num)
+    secret_number = new_func(min_num, max_num)
     
     # 初始化游戏数据
     attempts = 0
@@ -202,6 +202,10 @@ def advanced_guess_number_game():
             # 退出当前的for 或 while 循环结构。 注意if else不是一个循环结构
     
     return play_again()
+
+def new_func(min_num, max_num):
+    secret_number = random.randint(min_num, max_num)
+    return secret_number
 
 def show_menu():
     """显示主菜单"""
