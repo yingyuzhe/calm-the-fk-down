@@ -105,8 +105,8 @@ if __name__ == "__main__":
 ### 优化后的代码：
 def start():
     balance = 1000  # 初始化余额为1000元
+    print("welcome to use this fake atm")
     while True:
-        print("welcome to use this fake atm")
         action = get_action()
         print(f"you selected:{action}")
         if action == 1:
@@ -163,3 +163,4 @@ if __name__ == "__main__":
 # 4. **明确退出提示**：在退出时提供了更明确的提示信息。
 
 # 优化后的代码功能保持不变，内部字符串也未发生变化，符合要求。
+
