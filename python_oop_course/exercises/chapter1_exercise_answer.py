@@ -374,3 +374,46 @@ def get_pnumber(prompt):
         except ValueError:
             print("Please enter a valid integer.")
 
+#### 练习 5.2：约瑟夫环问题
+# 有 `n` 个人围成一圈，编号从1到 `n`。从第一个人开始报数，数到 `k` 的人出局，接着从下一个人重新开始报数，直到所有人都出局。编写一个函数 `josephus(n, k)`，返回出局顺序。
+# - 示例：
+#   ```python
+#   print(josephus(7, 3))  # [3, 6, 2, 7, 5, 1, 4]
+#   ```
+def josephus(n,k):
+   for i in range(1,n+1):
+      l=[].append(i)
+   #列表初始化问题 用list(range(1, n + 1))
+   l2=[]
+   for j in range(1,n+1):
+      yushu=j*k%n
+      l2=l2.append(l[yushu-1])
+      # 这里append方法会修改l2，同时返回一个none. 变量=变量.appned(x)的返回结果都会是none，因为append()是直接修改的X，同时返回none。
+   return l2
+## 优化版
+def josephus(n,k):
+   l=list(range(1, n + 1))
+   l2=[]
+   for j in range(1,n+1):
+      yushu=j*k%n
+      l2.append(l[yushu-1])
+   return l2
+
+# 但是这里的结果依然不正确，因为没有考虑l长度变化的问题。
+# 同时需要空滤0值的情况。
+def josephus(n, k):
+    if n <= 0 or k <= 0:
+        raise ValueError("n and k must be positive integers")
+    
+    l = list(range(1, n + 1))
+    l2 = []
+    index = 0
+    
+    while len(l) > 0:
+        index = (index + k - 1) % len(l)
+        l2.append(l.pop(index))
+        # pop()用于移除列表中指定索引位置的元素，并返回该元素。
+        # l.pop(index)：从列表 l 中移除索引为 index 的元素，并返回该元素。
+        # l2.append(...)：将 pop() 返回的元素添加到列表 l2 中。
+    return l2
+
