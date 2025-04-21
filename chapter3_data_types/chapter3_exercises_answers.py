@@ -169,20 +169,222 @@ print(df.iloc[0, 0]) #选择第1行，第1列。 因为行label通常和行index
 #df的排序方法.sort_values(by=column_name,ascending=boolean)
 df.sort_values(by='score',ascending= False)
 
-# 7. 数据处理实战：
+# 7. 数据处理实战：使用pandas
 #    - 从CSV文件读取数据
 #    - 处理缺失值
 #    - 按特定条件筛选数据
 #    - 创建数据透视表
+import pandas as pd
+import numpy as np
 
+# 1. 创建示例CSV数据
+sample_data = {
+    '姓名': ['张三', '李四', '王五', '赵六', '钱七'],
+    '年龄': [25, np.nan, 35, 28, 32],
+    '部门': ['技术', '销售', '技术', '市场', '销售'],
+    '工资': [10000, 12000, np.nan, 9000, 15000]
+}
+df = pd.DataFrame(sample_data)
+df.to_csv('employee_data.csv', index=False)
+
+# 2. 从CSV文件读取数据
+df = pd.read_csv('employee_data.csv')
+print("\n原始数据:")
+print(df)
+
+# 3. 处理缺失值
+# 年龄用平均值填充，工资用中位数填充
+df['年龄'] = df['年龄'].fillna(df['年龄'].mean())  #df['年龄']不再是dataframe格式，而是一个series序列。
+df['工资'] = df['工资'].fillna(df['工资'].median())
+print("\n处理缺失值后:")
+print(df)
+#.fillna(value,method=[ffill向前填充,bfill向后填充],inplace=booleam是否原地修改数据)
+
+# 4. 按条件筛选数据
+# 筛选技术部门的员工
+tech_staff = df[df['部门'] == '技术']
+tech_staff = df.loc[df['部门'] == '技术'] # 效果一样
+print("\n技术部门员工:")
+print(tech_staff)
+
+# 筛选工资大于10000的员工
+high_salary = df[df['工资'] > 10000] # 得到满足列条件的所有行
+# boolean series = df['column_name'] + logical caculation
+# df['工资'] > 10000 --> [F,T,T,F,T]
+# sum(df['工资'] > 10000) --> 3 直接返回满足条件的行数
+# df[boolean_series] -->  返回所有满足逻辑判断条件的行
+print("\n高工资员工:")
+print(high_salary)
+
+# 5. 创建数据透视表
+# 按部门统计平均工资和人数
+pivot_table = pd.pivot_table(
+    df, #除了第一个df没有用=号传参之外，其他参数传递都用了=号
+    values=['工资', '年龄'],  # 指数据透视表中的指标字段
+    index=['部门'], # 指数据透视表中的维度字段
+    aggfunc={           # 指数据透视表中指标字段的计算方式： 计数、求和 ……
+        '工资': 'mean',  # 注意这里面的计算函数，直接用‘’框起来了
+        '年龄': 'count'
+    }
+)
+print("\n部门统计:")
+print(pivot_table)
 # ## 挑战题
 
 # 8. 创建一个学生成绩管理系统，要求：
-#    - 使用字典存储学生信息（姓名、多门课程成绩）
+#    - 使用dataframe存储学生信息（姓名、多门课程成绩）
 #    - 支持添加/删除学生
 #    - 支持修改成绩
 #    - 计算每个学生的平均成绩
 #    - 找出每门课程的最高分
+
+import pandas as pd
+import numpy as np
+
+sample_data = {
+    'name': ['张三', '李四', '王五', '赵六', '钱七'],
+    'literature': [90, 80, np.nan, 70, 81],
+    'history': [99, 95, 80, 60, 50],
+    'math': [50, 60,70, np.nan, 90]
+}
+
+df = pd.DataFrame(sample_data)
+def add_st(st_name,literature_score,history_score,math_score):
+    df.loc[len(df)]={'name':st_name,
+    'literature':literature_score,
+    'history':history_score,
+    'math':math_score}
+    return df
+
+def mod_st(st_name,col_list,new_value_list):
+    df.loc[df['name']==st_name,col_list] = new_value_list
+    return df
+
+def del_st(st_name):
+    df.set_index('name',inplace=True) # 将姓名设置为索引
+    df=df.drop(st_name)
+    return df
+
+def st_avg_score(st_name):
+    df['avg']=df['literature':'math'].mean()
+    result = df[['name','avg']]
+    return result
+
+def max_score():
+    result=pd.pivot_table(
+        df,
+        values=['literature','history','math'],
+        aggfunc={
+            'literature': 'max', 
+            'history': 'max', 
+            'math': 'max', 
+        }
+    )
+    return result
+
+# AI answer 
+import pandas as pd
+import numpy as np
+
+class StudentManager:
+    def __init__(self):
+        self.df = pd.DataFrame({
+            'name': ['张三', '李四', '王五', '赵六', '钱七'],
+            'literature': [90, 80, np.nan, 70, 81],
+            'history': [99, 95, 80, 60, 50],
+            'math': [50, 60, 70, np.nan, 90]
+        })
+        
+    def add_student(self, st_name, literature_score, history_score, math_score):
+        """添加学生信息"""
+        try:
+            if st_name in self.df['name'].values:
+                raise ValueError(f"学生 {st_name} 已存在！")
+            
+            new_student = {
+                'name': st_name,
+                'literature': literature_score,
+                'history': history_score,
+                'math': math_score
+            }
+            self.df = self.df.append(new_student, ignore_index=True)
+            return True
+        except Exception as e:
+            print(f"添加学生失败: {str(e)}")
+            return False
+
+    def modify_scores(self, st_name, col_list, new_value_list):
+        """修改学生成绩"""
+        try:
+            if st_name not in self.df['name'].values:
+                raise ValueError(f"找不到学生 {st_name}")
+            if len(col_list) != len(new_value_list):
+                raise ValueError("科目和成绩数量不匹配")
+            
+            self.df.loc[self.df['name'] == st_name, col_list] = new_value_list
+            return True
+        except Exception as e:
+            print(f"修改成绩失败: {str(e)}")
+            return False
+
+    def delete_student(self, st_name):
+        """删除学生信息"""
+        ## 修改df行数据是一定要重置索引，避免因索引重复而导致问题。
+        #  reset_index(drop=True) 和 .append(df2,ignore_index=True) 分别展示了删除和新增时重置索引的操作。
+        try:
+            if st_name not in self.df['name'].values:
+                raise ValueError(f"找不到学生 {st_name}")
+            
+            self.df = self.df[self.df['name'] != st_name].reset_index(drop=True)
+            return True
+        except Exception as e:
+            print(f"删除学生失败: {str(e)}")
+            return False
+
+    def get_average_scores(self):
+        """计算所有学生平均成绩"""
+        try:
+            score_columns = ['literature', 'history', 'math']
+            self.df['average'] = self.df[score_columns].mean(axis=1)
+            return self.df[['name', 'average']].copy()
+        except Exception as e:
+            print(f"计算平均分失败: {str(e)}")
+            return None
+
+    def get_highest_scores(self):
+        """获取各科目最高分"""
+        try:
+            score_columns = ['literature', 'history', 'math']
+            return self.df[score_columns].max()
+        except Exception as e:
+            print(f"获取最高分失败: {str(e)}")
+            return None
+
+    def display_all(self):
+        """显示所有学生信息"""
+        print("\n当前所有学生信息：")
+        print(self.df)
+        
+# 主要改进：
+
+# 面向对象设计
+# 将所有功能封装在 StudentManager 类中
+# 更好的数据封装和管理
+
+# 错误处理
+# 添加了异常处理机制
+# 增加了输入验证
+# 提供了错误提示
+
+# 数据一致性
+# 保持 DataFrame 结构的一致性
+# 使用 reset_index 维护索引
+
+# 功能增强
+# 添加了数据验证
+# 增加了显示功能
+# 改进了平均分计算方法
+
 
 # 9. 数据分析项目：
 #    - 使用Pandas读取一个真实数据集
